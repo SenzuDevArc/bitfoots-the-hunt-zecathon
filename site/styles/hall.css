@@ -1,0 +1,38 @@
+.overlay.hall-on { padding: 0; }
+.hall { position: fixed; inset: 0; z-index: 3; background: #20160d; font-family: "Plex Cond", system-ui, sans-serif; color: #fff3c4; user-select: none; -webkit-user-select: none; touch-action: none; }
+.hall canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+.hall-top { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 56px 14px 20px; pointer-events: none; }
+.hall-top > * { pointer-events: auto; }
+.hall-zec { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: #3a2514; border: 3px solid #1f130a; box-shadow: inset 0 2px 0 rgba(154, 106, 58, .5), 0 3px 0 rgba(0, 0, 0, .5);
+  font-weight: 600; font-size: 18px; line-height: 24px; letter-spacing: .08em; }
+.hall-zec b { color: #f0c14e; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hall-coin { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle, #f0c14e 0 5px, #9a7424 5px 7px, #f0c14e 7px 9px); }
+.hall-title { position: absolute; left: 50%; transform: translateX(-50%); font-weight: 600; font-size: 16px; letter-spacing: .3em; color: #eaba49; text-shadow: 0 2px 0 #1f130a; pointer-events: none; }
+.hall-btns { display: flex; gap: 8px; }
+.hall-btn { padding: 8px 16px; font: inherit; font-weight: 600; font-size: 15px; line-height: 20px; letter-spacing: .12em; color: #fff3c4; cursor: pointer;
+  background: #5a3a1e; border: 3px solid #1f130a; box-shadow: inset 0 2px 0 rgba(255, 220, 160, .25), 0 3px 0 rgba(0, 0, 0, .5); }
+.hall-btn:hover { background: #7d5530; }
+.hall-btn:active { transform: translateY(2px); }
+.hall-btn.on { color: #1f130a; background: #eaba49; box-shadow: inset 0 2px 0 #ffe9a8, inset 0 -3px 0 #a67c1f, 0 3px 0 rgba(0, 0, 0, .5); }
+.hall-card { position: absolute; left: 50%; top: 64px; transform: translate(-50%, -6px); min-width: 280px; max-width: calc(100vw - 32px); padding: 10px 22px 12px; text-align: center;
+  background: #3a2514; border: 3px solid #1f130a; box-shadow: inset 0 2px 0 rgba(154, 106, 58, .5), 0 4px 0 rgba(0, 0, 0, .5); opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; }
+.hall-card.on { opacity: 1; transform: translate(-50%, 0); }
+.hall-name { font-weight: 600; font-size: 20px; line-height: 26px; letter-spacing: .12em; color: #fff3c4; text-shadow: 0 2px 0 #1f130a; }
+.hall-line { margin-top: 2px; font-weight: 600; font-size: 14px; line-height: 20px; letter-spacing: .14em; color: #e3c39a; }
+.hall-card.k-buy .hall-line, .hall-card.k-own .hall-line, .hall-card.k-on .hall-line { color: #f0c14e; }
+.hall-card.k-poor .hall-line { color: #e3a08a; }
+.hall-hint { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-weight: 600; font-size: 13px; letter-spacing: .2em; color: rgba(255, 243, 196, .6); text-shadow: 0 2px 0 #1f130a; pointer-events: none; }
+.hall-pad { display: none; position: absolute; left: 12px; right: 12px; bottom: 12px; justify-content: space-between; align-items: center; gap: 10px; }
+.hall.touch .hall-pad { display: flex; }
+.hall-pb { min-width: 64px; height: 56px; padding: 0 14px; font: inherit; font-weight: 600; font-size: 20px; color: #fff3c4; background: rgba(58, 37, 20, .9); border: 3px solid #1f130a;
+  box-shadow: inset 0 2px 0 rgba(154, 106, 58, .5), 0 3px 0 rgba(0, 0, 0, .5); touch-action: none; }
+.hall-pb.go { flex: 1; max-width: 200px; font-size: 16px; letter-spacing: .16em; color: #1f130a; background: #eaba49; box-shadow: inset 0 2px 0 #ffe9a8, inset 0 -3px 0 #a67c1f, 0 3px 0 rgba(0, 0, 0, .5); }
+@media (max-width: 600px) {
+  .hall-top { padding: 10px 44px 10px 10px; }
+  .hall-title { display: none; }
+  .hall-btn { padding: 6px 10px; font-size: 13px; }
+  .hall-zec { font-size: 15px; padding: 4px 10px 4px 8px; }
+  .hall-card { top: 58px; min-width: 0; width: calc(100vw - 24px); padding: 8px 12px 10px; }
+  .hall-name { font-size: 17px; line-height: 22px; }
+  .hall-line { font-size: 12px; line-height: 17px; }
+}

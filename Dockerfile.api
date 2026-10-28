@@ -1,0 +1,17 @@
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS deps
+WORKDIR /app/server
+COPY server/package.json server/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=deps /app/server/node_modules server/node_modules
+COPY server/lib/common.js server/lib/common.js
+COPY server/api/server.js server/api/save.js server/api/store.js server/api/migrations.js server/api/owner-bot.js server/api/
+COPY server/api/owner/index.html server/api/owner/owner.js server/api/owner/owner.css server/api/owner/
+COPY site/levels/levels.js site/levels/
+COPY site/characters/cosmetics.js site/characters/characters.js site/characters/prices.js site/characters/
+USER node
+EXPOSE 8080
+CMD ["node", "server/api/server.js"]

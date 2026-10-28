@@ -1,0 +1,21 @@
+.memo-pop { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.55); z-index: 70; }
+.memo-pop.on { display: flex; }
+.memo-card { background: #000; border: 3px solid #fff; padding: 18px 22px; width: min(380px, calc(100vw - 24px)); font: 600 14px "Plex Mono", monospace; color: #fffaf0; text-align: center; }
+.memo-h { color: #eaba49; letter-spacing: 0.14em; font-size: 18px; margin-bottom: 10px; }
+.memo-say { margin: 4px 0; line-height: 1.45; }
+.memo-menu { margin: 10px 0 0; text-align: left; }
+.memo-item { display: flex; gap: 10px; align-items: baseline; padding: 4px 8px; border-bottom: 1px dashed #5a4020; }
+.memo-item b { color: #eaba49; font-size: 18px; min-width: 18px; }
+.memo-item i { margin-left: auto; font-style: normal; color: #a8e6a0; }
+.memo-item.got { color: #8a7a60; text-decoration: line-through; }
+.memo-item.got i { color: #8a7a60; text-decoration: none; }
+.memo-field { margin: 14px auto 12px; padding: 8px; border: 2px solid #eaba49; font-size: 22px; color: #eaba49; letter-spacing: 0.06em; }
+.memo-v { color: #fff; }
+.memo-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.memo-k { font: 700 20px "Plex Mono", monospace; padding: 10px 0; background: #1a1208; color: #fffaf0; border: 2px solid #5a4020; cursor: pointer; }
+.memo-k.f, .memo-k:hover { border-color: #eaba49; background: #3a2810; }
+.memo-k.ok { color: #a8e6a0; }
+.memo-err { min-height: 18px; margin-top: 8px; color: #e04632; letter-spacing: 0.06em; }
+.memo-hint { font-size: 11px; color: #8a7a60; letter-spacing: 0.08em; }
+.memo-pop.shake .memo-card { animation: memoShake 0.3s; }
+@keyframes memoShake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }

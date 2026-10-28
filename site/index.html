@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-ecv="50">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Bitfoot: The Hunt</title>
+<link rel="icon" href="assets/ui/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="styles/end-card-variants.css">
+<link rel="stylesheet" href="styles/end-card.css">
+<link rel="stylesheet" href="styles/world-map.css">
+<link rel="stylesheet" href="styles/hall.css">
+<link rel="stylesheet" href="styles/payment-machine.css">
+<link rel="stylesheet" href="styles/puzzles.css">
+<link rel="stylesheet" href="styles/caught.css">
+<link rel="stylesheet" href="styles/end-question.css">
+<link rel="stylesheet" href="styles/memo.css">
+<link rel="stylesheet" href="styles/prequel-end.css">
+</head>
+<body class="trail">
+<canvas id="game" aria-label="Bitfoot: The Hunt"></canvas>
+<div id="hudbtns" class="hudbtns">
+  <button id="pause" aria-label="Pause"><svg viewBox="0 0 16 16" width="16" height="16"><rect x="3" y="3" width="3.5" height="10" fill="currentColor"/><rect x="9.5" y="3" width="3.5" height="10" fill="currentColor"/></svg></button>
+  <button id="mute" aria-label="Volume" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M2 6h3l4-3v10L5 10H2z" fill="currentColor"/><path class="w" d="M11 5.5c1 .8 1.5 1.6 1.5 2.5s-.5 1.7-1.5 2.5" stroke="currentColor" fill="none" stroke-width="1.4"/><path class="s" d="M11 5l4 6M15 5l-4 6" stroke="currentColor" stroke-width="1.4"/></svg></button>
+</div>
+<div id="goal" class="goal" aria-live="polite"></div>
+<div id="strip" class="strip"></div>
+<button id="decoy" aria-label="Throw a decoy">DECOY</button>
+<button id="sprint" aria-label="Sprint (hold)">SPRINT</button>
+<div id="carry" class="carry-btns" aria-label="Items you carried in"></div>
+<div id="overlay" class="overlay"></div>
+<script src="engine/reduced-motion.js"></script>
+<script src="levels/facts.js"></script>
+<script src="levels/levels.js"></script>
+<script src="engine/sprite.js"></script>
+<script src="engine/music.js"></script>
+<script src="engine/audio.js"></script>
+<script src="characters/cosmetics.js"></script>
+<script src="characters/characters.js"></script>
+<script src="characters/prices.js"></script>
+<script src="engine/network-receipt.js"></script>
+<script src="engine/core.js"></script>
+<script src="engine/world.js"></script>
+<script src="engine/actors.js"></script>
+<script src="engine/bosses.js"></script>
+<script src="mechanics/rangers-matchers-memos.js"></script>
+<script src="mechanics/burrows-leaves-seeds.js"></script>
+<script src="mechanics/dust-crows-cameras.js"></script>
+<script src="mechanics/disguise-kyc-fake-den.js"></script>
+<script src="mechanics/blocks-bridges.js"></script>
+<script src="mechanics/cave.js"></script>
+<script src="mechanics/auditor-flock-stakeout.js"></script>
+<script src="mechanics/sealed-notes-crowd-saws.js"></script>
+<script src="mechanics/powerups.js"></script>
+<script src="mechanics/items.js"></script>
+<script src="screens/teach.js"></script>
+<script src="engine/clip-recorder.js"></script>
+<script src="screens/ui.js"></script>
+<script src="screens/hud-medals.js"></script>
+<script src="screens/achievements.js"></script>
+<script src="screens/badges.js"></script>
+<script src="screens/forest.js"></script>
+<script src="screens/landing.js"></script>
+<script src="screens/hall.js"></script>
+<script src="characters/hall-moves.js"></script>
+<script src="characters/level-effects.js"></script>
+<script src="screens/world-map.js"></script>
+<script src="screens/story.js"></script>
+<script src="screens/talk.js"></script>
+<script src="mechanics/stamps.js"></script>
+<script src="mechanics/river.js"></script>
+<script src="mechanics/notes.js"></script>
+<script src="mechanics/bank.js"></script>
+<script src="mechanics/jar.js"></script>
+<script src="mechanics/glass-key.js"></script>
+<script src="mechanics/keys.js"></script>
+<script src="mechanics/scam-key.js"></script>
+<script src="mechanics/edge.js"></script>
+<script src="mechanics/lighthouse.js"></script>
+<script src="engine/hunt-mode.js"></script>
+<script src="screens/prequel-end.js"></script>
+<script src="screens/puzzles.js"></script>
+<script src="mechanics/nullifier.js"></script>
+<script src="screens/payment-machine.js"></script>
+<script src="screens/machine-scenes.js"></script>
+<script src="mechanics/miner.js"></script>
+<script src="mechanics/proof.js"></script>
+<script src="mechanics/unified-address.js"></script>
+<script src="mechanics/fun-chase.js"></script>
+<script src="mechanics/fun-gags.js"></script>
+<script src="mechanics/fun-rides.js"></script>
+<script src="mechanics/fun-secrets.js"></script>
+<script src="mechanics/doors.js"></script>
+<script src="mechanics/mail.js"></script>
+<script src="mechanics/dam.js"></script>
+<script src="levels/bonus-levels.js"></script>
+<script src="screens/build-it.js"></script>
+<script src="levels/order.js"></script>
+<script src="engine/router.js"></script>
+<script src="engine/account-sync.js"></script>
+</body>
+</html>

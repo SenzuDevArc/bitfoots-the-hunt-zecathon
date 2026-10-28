@@ -1,0 +1,21 @@
+{
+  "name": "bitfoots-the-hunt-zecathon",
+  "version": "1.0.0",
+  "description": "Bitfoot: The Hunt, a browser stealth game that teaches how Zcash shielded payments work.",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "author": "SenzuDevArc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SenzuDevArc/bitfoots-the-hunt-zecathon.git"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node test/csp-serve.js 5191",
+    "test": "node test/remap-check.js && node test/login-check.js && node test/build-site-check.js && node test/names-check.js",
+    "test:browser": "node test/core-check.js && node test/spawn-check.js && node test/caught-check.js && node test/river-check.js && node test/machine-check.js && node test/stamps-check.js && node test/edge-check.js && node test/ui-flow-check.js && node test/built-smoke-check.js",
+    "test:replay": "node test/replay-check.js"
+  }
+}

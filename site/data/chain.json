@@ -1,0 +1,38 @@
+{
+  "fetched_at": "2026-09-29T08:39:47.881Z",
+  "shielded": {
+    "source": "zecstats",
+    "as_of": "2026-09-29T08:39:43.229Z",
+    "shielded_zec": 4891748.61,
+    "shielded_pct": 28.85,
+    "transparent_zec": 12000488.18,
+    "pools_zec": {
+      "sprout": 22313.31,
+      "sapling": 502212.68,
+      "orchard": 379547.03,
+      "ironwood": 3987675.59
+    },
+    "shielded_change_30d_zec": 43639.14,
+    "ironwood": {
+      "activation_height": 3428143,
+      "activation_date": "2026-07-28",
+      "migration_pct": 89.5
+    }
+  },
+  "genesis": {
+    "source": "3xpl + blockchair (must agree)",
+    "height": 0,
+    "hash": "00040fe8ec8471911baa1db1266ea15dd06b4a8a5c453883c000b031973dce08",
+    "time": "2016-10-28T07:56:00.000Z"
+  },
+  "latest": {
+    "source": "blockchair",
+    "height": 3500112,
+    "hash": "00000000007fc4da9313ab1a101b6c9593ce00433e2fb66fc7253ba46e8a9103",
+    "time": "2026-09-29T08:38:28.000Z"
+  },
+  "attribution": {
+    "zecstats": "Data: ZecStats (https://zecstats.org), CC BY 4.0",
+    "blocks": "Block data: 3xpl (https://3xpl.com) and Blockchair (https://blockchair.com)"
+  }
+}

@@ -1,0 +1,73 @@
+{
+	admin off
+	servers {
+		trusted_proxies static private_ranges 100.64.0.0/10
+		trusted_proxies_strict
+	}
+}
+:{$PORT:80} {
+	root * {$SITE_ROOT:/srv}
+	header {
+		X-Robots-Tag "noindex, nofollow"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		Content-Security-Policy "default-src 'self'; img-src 'self' data: blob:; connect-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), midi=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=(), screen-wake-lock=(), idle-detection=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Resource-Policy "same-origin"
+		X-Frame-Options "DENY"
+	}
+	header -Server
+	header -Via
+	encode {
+		gzip
+		zstd
+	}
+	@screens {
+		path /socials /how-to-play /profile /map /badges /wardrobe /wardrobe/* /level/* /ending /ending/*
+		not path */index.html
+	}
+	@api path /api /api/*
+	@oldlogin {
+		path /login /login/ /login/*
+		not path /login/unavailable.html /login/login.css /login/ibm-plex-sans-condensed-500.woff2 /login/ibm-plex-sans-condensed-600.woff2
+	}
+	@loginfiles path /login/*
+	@climb path_regexp climb (?i)(\.\.|%2e|%2f|%5c|\\)
+	@versioned query v=*
+	@unversioned not query v=*
+	@music path /assets/music/*
+	route {
+		respond @climb "Bad Request" 400
+		respond /health "ok" 200
+		respond @api "Not Found" 404
+		redir @oldlogin / 302
+		handle @loginfiles {
+			header Cache-Control "no-cache"
+			file_server {
+				precompressed br zstd gzip
+			}
+		}
+		header @versioned Cache-Control "private, max-age=31536000, immutable"
+		header @unversioned Cache-Control "private, no-cache"
+		header @music Cache-Control "private, max-age=604800"
+		rewrite @screens /index.html
+		file_server {
+			precompressed br zstd gzip
+		}
+	}
+	handle_errors 502 503 504 {
+		header -Server
+		header -Via
+		header Cache-Control "no-store"
+		rewrite * /login/unavailable.html
+		file_server
+	}
+	handle_errors {
+		header -Server
+		header -Via
+		header Cache-Control "no-cache"
+		respond "{err.status_code} {err.status_text}"
+	}
+}

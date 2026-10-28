@@ -1,0 +1,13 @@
+.ec-q { margin: 14px 0 0; padding: 10px 12px; max-width: 560px; border: 2px solid var(--bark-edge, #1f130a); background: var(--bark-lo, #3f2815); box-shadow: inset 0 2px 0 var(--bark-hi, #86592f); }
+.ec-q-ask { margin: 0; font-weight: 600; font-size: 14px; line-height: 18px; letter-spacing: .04em; color: var(--gold); text-wrap: balance; }
+.ec-q-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.ec-q-a { flex: 1 1 200px; min-height: 40px; padding: 6px 10px; border: 2px solid var(--bark-edge, #1f130a); background: var(--bark, #5f3e22); color: var(--ink);
+  font: inherit; font-weight: 600; font-size: 13px; letter-spacing: .04em; cursor: pointer; box-shadow: inset 0 -2px 0 var(--bark-lo, #3f2815), inset 0 2px 0 var(--bark-hi, #86592f); }
+.ec-q-a:active { transform: translateY(2px); }
+.ec-q.done .ec-q-a { cursor: default; opacity: .55; }
+.ec-q.done .ec-q-a.picked { opacity: 1; }
+.ec-q.is-ok .ec-q-a.picked { background: #3f6b2a; }
+.ec-q.is-no .ec-q-a.picked { background: #7a2b22; }
+.ec-q-say { margin: 8px 0 0; min-height: 18px; font-weight: 600; font-size: 13px; line-height: 18px; letter-spacing: .04em; color: var(--ink); }
+.ec-q.is-ok .ec-q-say { color: #a8e6a0; }
+.ec-onmap .ec-q { width: min(520px, 100%); box-sizing: border-box; margin: 0; text-align: center; }

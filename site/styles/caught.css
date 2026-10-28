@@ -1,0 +1,41 @@
+.trail .overlay.caught { padding-top: 56px; background: radial-gradient(ellipse at 50% 50%, rgba(5, 8, 6, .2) 0, rgba(5, 8, 6, .6) 100%); }
+.trail .caughtcard { width: min(640px, 100%); gap: 16px; padding: 40px 44px 32px; color: #fff3c4; background: #3a2514; border: 4px solid #86592f;
+  box-shadow: 0 0 0 4px #1f130a, 0 10px 0 #050906, 0 24px 64px rgba(0, 0, 0, .6); }
+.trail .caughtcard .cc-word { position: static; transform: none; margin: 0; padding: 0; white-space: nowrap; background: none; border: 0; box-shadow: none;
+  font-size: 56px; line-height: 60px; color: #ffe08a; letter-spacing: .2em; text-shadow: 0 4px 0 #1f130a; }
+.trail .caughtcard .cc-word::before, .trail .caughtcard .cc-word::after { content: none; }
+.trail .caughtcard .cc-bl { color: #c9a27a; font-weight: 700; font-size: 13px; line-height: 16px; letter-spacing: .16em; text-shadow: none; }
+.trail .caughtcard .cc-how, .trail .caughtcard .cc-cause { align-self: stretch; margin: 0; text-align: left; background: rgba(31, 19, 10, .6); border: 2px solid #5f3e22; box-shadow: none; }
+.trail .caughtcard .cc-how .cc-bl { text-align: inherit; }
+.trail .caughtcard .cc-how { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px; color: #fff3c4; font-size: 22px; line-height: 30px; text-wrap: pretty; }
+.trail .caughtcard .cc-cause { width: auto; gap: 0; padding: 4px 20px; }
+.trail .caughtcard .cc-line { display: grid; grid-template-columns: 96px 1fr; align-items: baseline; gap: 12px; padding: 8px 0;
+  color: #fff3c4; font-size: 16px; line-height: 22px; text-wrap: pretty; }
+.trail .caughtcard .cc-line + .cc-line { border-top: 2px solid #5f3e22; }
+.trail .caughtcard .cc-bars:not(.cc-cause) { margin: 0; }
+.trail .caughtcard .cc-bar { grid-template-columns: 56px 1fr 112px; }
+.trail .caughtcard .cc-bv { text-align: right; color: #ffe08a; font-weight: 700; font-size: 13px; letter-spacing: .1em; }
+.trail .caughtcard .cc-track { height: 10px; background: #1f130a; border: 2px solid #5f3e22; }
+.trail .caughtcard .cc-fill { background: #eaba49; box-shadow: inset -2px -2px 0 #8a5e10; }
+.trail .caughtcard .cc-money { padding: 6px 14px; color: #ffe08a; font-weight: 700; font-size: 15px; line-height: 21px; letter-spacing: .02em; background: #1f130a; border: 2px solid #5f3e22; }
+.trail .caughtcard .ec-primary, .trail .caughtcard .ec-links button { position: relative; display: block; height: auto; min-height: 0; margin: 0; padding: 12px 20px; text-align: center; cursor: pointer;
+  font: inherit; font-weight: 700; font-size: 16px; line-height: 20px; letter-spacing: .14em; text-transform: uppercase;
+  color: #fff3c4; background: #86592f; border: 3px solid #1f130a; box-shadow: inset 0 3px 0 #b07a44, 0 5px 0 #1f130a; transition: transform .06s, box-shadow .06s; }
+.trail .caughtcard .ec-primary { width: min(320px, 100%); color: #2c1d10; background: #eaba49; box-shadow: inset 0 3px 0 #ffe08a, 0 5px 0 #1f130a; outline: 3px solid #fff3c4; outline-offset: 3px; }
+.trail .caughtcard .ec-primary::before { content: "▶"; position: absolute; left: -34px; top: 50%; transform: translateY(-50%); color: #ffe08a; font-size: 18px; animation: tpNudge .8s ease-in-out infinite; }
+.trail .caughtcard .ec-primary:hover { color: #2c1d10; background: #eaba49; filter: brightness(1.1); }
+.trail .caughtcard .ec-links button:hover { color: #fff3c4; filter: brightness(1.1); }
+.trail .caughtcard .ec-primary:active, .trail .caughtcard .ec-links button:active { transform: translateY(4px); box-shadow: inset 0 3px 0 rgba(255, 255, 255, .15), 0 1px 0 #1f130a; }
+.trail .caughtcard .ec-links { display: flex; flex-wrap: nowrap; gap: 12px; width: min(320px, 100%); margin: 0; }
+.trail .caughtcard .ec-links button { flex: 1 1 0; min-width: 0; padding: 12px 8px; }
+.trail .caughtcard .ec-links span { display: none; }
+.trail .caughtcard .cta-hint { margin: 0; color: #c9a27a; }
+@media (min-height: 880px) { .trail .caughtcard { gap: 22px; } }
+@media (max-width: 560px) {
+  .trail .caughtcard { padding: 24px 16px 20px; gap: 16px; }
+  .trail .caughtcard .cc-word { font-size: 36px; line-height: 40px; }
+  .trail .caughtcard .cc-how { font-size: 18px; line-height: 25px; text-align: center; }
+  .trail .caughtcard .cc-line { grid-template-columns: 1fr; gap: 0; }
+  .trail .caughtcard .ec-primary::before { left: -26px; }
+  .trail .caughtcard .ec-links button { font-size: 14px; letter-spacing: .1em; }
+}

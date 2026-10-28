@@ -1,0 +1,57 @@
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24
+      - run: npm test
+
+  browser:
+    if: ${{ github.event_name != 'push' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CDP_BASE: http://127.0.0.1:5191/
+      CHROME_PATH: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24
+      - name: Chrome
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          "$CHROME_PATH" --version
+      - name: Serve the game
+        run: |
+          nohup node test/csp-serve.js 5191 > "$RUNNER_TEMP/serve.log" 2>&1 &
+          for i in $(seq 1 50); do curl -sf http://127.0.0.1:5191/health && exit 0; sleep 0.2; done
+          cat "$RUNNER_TEMP/serve.log"; exit 1
+      - name: Browser checks, real-input UI flow, built-site smoke
+        run: |
+          fail=0
+          for f in $(node -p 'require("./package.json").scripts["test:browser"].match(/test\/[\w-]+\.js/g).join(" ")'); do
+            echo "::group::$f"; node "$f" || { fail=1; echo "::error::$f failed"; }; echo "::endgroup::"
+          done
+          exit $fail
+      - name: Replay of every level (report only)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: node test/replay-check.js "" "$RUNNER_TEMP/shots"

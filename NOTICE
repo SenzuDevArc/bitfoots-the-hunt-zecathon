@@ -1,0 +1,24 @@
+Bitfoot: The Hunt
+
+Copyright (c) 2026 SenzuDevArc. The code is licensed under the GNU AGPL v3 (see LICENSE). The BitFoots art, characters and names, and the original music, are not covered by that license; all rights reserved. Third-party parts keep their own licenses: IBM Plex fonts (SIL OFL 1.1), 'Uncatchable' by Alexandr Zhelanov (CC BY 4.0).
+
+In detail:
+
+1. BitFoots art, characters and names. The BitFoots artwork, character designs,
+   character names and the BitFoots name, including the pictures in
+   site/assets/art, site/assets/chars and site/assets/cut and the logo and
+   favicon in site/assets/ui, belong to the BitFoots team. All rights reserved.
+
+2. Music in site/assets/music.
+   - "Uncatchable" by Alexandr Zhelanov, licensed under Creative Commons
+     Attribution 4.0 (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/
+     Source: https://opengameart.org/content/uncatchable
+   - "Lantern Rounds" and "The Trapper's Due" are original tracks made for this
+     game, played with the GeneralUser GS SoundFont by S. Christian Collins,
+     which is free for music creation, private or commercial. The tracks
+     themselves are all rights reserved.
+
+3. Fonts. IBM Plex Mono and IBM Plex Sans Condensed in site/assets/fonts are
+   Copyright IBM Corp. and licensed under the SIL Open Font License 1.1. The
+   font files are subsets of the originals. The full license text is in
+   site/assets/fonts/OFL.txt.

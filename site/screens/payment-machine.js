@@ -1,0 +1,462 @@
+(function () {
+  "use strict";
+  var W = window;
+  if (typeof document === "undefined" || !document.createElement) return;
+  var BH = W.BH = W.BH || {};
+
+  var KEY = "bitfoot-trail-v2-machine";
+  var CW = 320, CH = 180;
+  var PAL = { k: "#1f130a", d: "#3a2514", w: "#86592f", b: "#c9a27a", g: "#eaba49", h: "#ffe08a", c: "#fff3c4", o: "#b07a2a",
+    r: "#d04a37", s: "#6f6a64", t: "#9a948c", l: "#9ff0fc", q: "#24414f", x: "#0b0805", a: "#2a2a2a",
+    G: "#eaba49", H: "#ffe08a", K: "#1f130a", n: "#7a4a22", m: "#9a6a3a", p: "#5a3418" };
+  var FAKE = { c: "#9a948c", g: "#9a948c", h: "#c8c2b8", w: "#5a5550", b: "#7a756e", r: "#7a756e", o: "#5a5550", d: "#3a3632", n: "#5a5550", m: "#7a756e", p: "#3a3632" };
+
+  var ICONS = {
+    pouch: ["............", "kkkkkkkkkkkk", "kmmmmmmmmmmk", "knnnnnnnnnnk", "knnnnnpppppk", "knnnnnppggpk",
+      "knnnnnppggpk", "knnnnnpppppk", "knnnnnnnnnnk", "knnnnnnnnnnk", "kkkkkkkkkkkk", "............"],
+    change: [".kkk........", "kghhk.......", "kgggk...kk..", "kgogk..kghk.", ".kkk...kggk.", ".....c..kk..",
+      ".cccccc.....", ".....c..kk..", ".......kghk.", ".......kggk.", "........kk..", "............"],
+    tracks: ["............", "........g...", "......g...g.", ".......ggg..", ".......ggg..", ".......ggg..",
+      "...g........", ".g...g......", "..ggg.......", "..ggg.......", "..ggg.......", "............"],
+    address: ["..........h.", ".........hgh", "..........h.", "kkkkkkkkkk..", "kkcccccckk..", "kckcccckck..",
+      "kcckcckcck..", "kccckkccck..", "kcccccccck..", "kkkkkkkkkk..", "............", "............"],
+    stamp: ["...kkkkk....", "...kbbbk....", "...kbbbk....", "....kwk.....", "....kwk.....", "..kkkkkkk...",
+      "..kdddddk...", "..kkkkkkk...", ".....g......", "...g...g....", "....ggg.....", "....ggg....."],
+    box: ["............", "............", "kkkkkkkkkkkk", "kckbbbbbbkck", "kcckbbbbkcck", "kccckrrkccck",
+      "kcccrrrrccck", "kccccrrcccck", "kcccccccccck", "kkkkkkkkkkkk", "............", "............"],
+    crowd: ["............", ".....kk.....", "....kbbk....", ".kk.kbbk.kk.", "kbbk.kk.kbbk", "kbbkkwwkkbbk",
+      ".kkkwwwwkkk.", "kwwkwwwwkwwk", "kwwkwwwwkwwk", "kwwkwwwwkwwk", "kkkkkkkkkkkk", "............"],
+    jar: ["...kkkkkk...", "...kwwwwk...", "..kkkkkkkk..", "..klqqqqqk..", ".klqqqqqqqk.", ".klqqKKqqqk.",
+      ".klqKGHKqqk.", ".klqKGGKqqk.", ".klqqKKqqqk.", ".kllqqqqqqk.", "..kkkkkkkk..", "............"],
+    gate: ["...kkkkkk...", "..kttttttk..", ".kttkkkkttk.", ".ktkgxgxktk.", ".kskgxgxksk.", ".kskgxgxksk.",
+      ".kskgxgxksk.", ".kskgxgxksk.", ".kskgxgxksk.", ".kskgxgxksk.", "kkkkkkkkkkkk", "............"],
+    key: ["............", "............", ".kkkk.......", "kllllkkkkkk.", "klkkllllllk.", "kllllkkkllk.",
+      ".kkkk...klk.", "........kk..", "............", "............", "............", "............"]
+  };
+  var TAG = ["..k..", ".khk.", "kgkgk", "kgggk", "kgggk", "kkkkk"];
+  var COIN = ["..kkkk..", ".khhggk.", "khggggok", "kgggggok", "kgggggok", "kggggook", ".kooook.", "..kkkk.."];
+  var MINI = ["........", "kkkkkkkk", "kckbbkck", "kccrrcck", "kccrrcck", "kcccccck", "kkkkkkkk", "........"];
+  var HUNTER = ["...kkkk...", "..kaaaak..", ".kkkkkkkk.", "..kbbbbk..", "..kbkbbk..", "..kbbbbk..", "..kkkkkk..",
+    ".kaaaaaak.", "kaarrrraak", "kaaaaaaaak", "kaaaaaaaak", ".kaaaaaak.", ".kaak.aak.", "..kak.kak.", "..kak.kak.", "..kk..kk.."];
+
+  function tiles(L, ch) { var m = L && L.map; if (!m || !m.join) return false; return m.join("").indexOf(ch) >= 0; }
+  var PARTS = [
+    { id: "pouch", name: "POUCH", act: 1, at: 0, find: function () { return true; } },
+    { id: "stamp", name: "STAMP", act: 1, at: 1, find: function (L) { return tiles(L, "M"); } },
+    { id: "tracks", name: "TRACKS", act: 1, at: 2, find: function (L) { return !!(L.hunters && L.hunters.length); } },
+    { id: "box", name: "SEALED BOX", act: 2, at: 4, find: function (L) { return tiles(L, "Y"); } },
+    { id: "gate", name: "PROOF GATE", act: 2, at: 4, find: function (L) { return tiles(L, "Y"); } },
+    { id: "jar", name: "TOKEN JAR", act: 2, at: 6, find: function (L) { return tiles(L, "j"); } },
+    { id: "key", name: "GLASS KEY", act: 2, at: 8, find: function (L) { return L.gateBy === "key"; } }
+  ];
+  var LINES = { 1: "EVERY TRANSACTION GETS CHECKED AND RECORDED IN ONE BIG SHARED BOOK, CALLED THE BLOCKCHAIN.", 2: "THAT IS THE ZCASH SHIELDED POOL: PRIVATE WATERS INSIDE THE SAME SHARED BOOK." };
+  var ENDS = { 1: 11.3, 2: 11.6 };
+  var BEATS = {
+    1: [
+      { t1: 3.1, say: "YOUR WALLET, YOUR BITFOOT STAMP AND YOUR FOOTPRINTS.", parts: ["YOUR WALLET, ", "YOUR BITFOOT STAMP ", "AND YOUR FOOTPRINTS."], at: [0.5, 1.3, 2.1] },
+      { t1: 7.6, say: "EVERY TIME YOU PAY, YOUR WALLET GENERATES A UNIQUE STAMP. EACH PAYMENT YOU MAKE LEAVES A FOOTPRINT." },
+      { t1: 9.65, say: "A SUSPICIOUS GUY TRIED TO FAKE A PAYMENT FROM YOUR WALLET." },
+      { t1: 10.7, say: "THE FAKE FAILS BECAUSE IT WASN'T ACTUALLY GENERATED BY YOUR WALLET." }
+    ],
+    2: [
+      { t1: 4.3, say: "IN THE SHIELDED WATERS, A TRANSACTION IS A MERE RIPPLE. NOBODY SEES WHO PAID OR HOW MUCH." },
+      { t1: 6.0, say: "YOUR COINS BECOME A SEALED NOTE ADDRESSED TO THE PERSON YOU PAY. ONLY THE TWO OF YOU CAN SEE WHAT'S INSIDE.", parts: ["YOUR COINS ", "BECOME A SEALED NOTE ADDRESSED TO THE PERSON YOU PAY. ONLY THE TWO OF YOU CAN SEE WHAT'S INSIDE."], at: [4.4, 5.8] },
+      { t1: 7.2, say: "THE PROOF GATE CHECKS IT IS REAL WITHOUT OPENING IT.", parts: ["THE PROOF GATE CHECKS IT IS REAL WITHOUT OPENING IT."], at: [6.45] },
+      { t1: 8.7, say: "THE NOTE DROPS ITS ONE-TIME TAG IN THE JAR. NO DOUBLE SPENDING.", parts: ["THE NOTE DROPS ITS ONE-TIME TAG IN THE JAR. NO DOUBLE SPENDING."], at: [7.9] },
+      { t1: 10.8, say: "YOUR GLASS KEY LETS SOMEONE SEE YOUR PAYMENTS, BUT NEVER MOVE YOUR COINS.", parts: ["YOUR GLASS KEY LETS SOMEONE SEE YOUR PAYMENTS, BUT NEVER MOVE YOUR COINS."], at: [9.05] }
+    ]
+  };
+
+  function levels() { var L = W.LEVELS; return L && L.length ? L : []; }
+  var held = false;
+  function resolve() {
+    if (held) return PARTS;
+    var L = levels();
+    PARTS.forEach(function (p) {
+      p.lv = p.at + 1; p.how = "fallback";
+      for (var i = 0; i < L.length; i++) {
+        if (!L[i] || L[i].bonus) continue;
+        var hit = false; try { hit = !!p.find(L[i], i); } catch (e) {}
+        if (hit) { p.lv = i + 1; p.how = "detected"; break; }
+      }
+    });
+    return PARTS;
+  }
+  function part(id) { resolve(); for (var i = 0; i < PARTS.length; i++) if (PARTS[i].id === id) return PARTS[i]; return null; }
+  function partsOfAct(a) { return resolve().filter(function (p) { return p.act === a; }); }
+  function gateAt(a) { var n = 0; partsOfAct(a).forEach(function (p) { if (p.lv > n) n = p.lv; }); return n; }
+  function earned(id) {
+    var p = part(id);
+    try {
+      if (p && typeof game !== "undefined" && game && game.levelIdx + 1 >= p.lv) return true;
+      return !!(p && typeof save !== "undefined" && save && save.stars && save.stars[p.lv] != null);
+    } catch (e) { return false; }
+  }
+  function book() { try { return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { return {}; } }
+  function played(a) { return !!book()[a]; }
+  function markPlayed(a) { try { var b = book(); b[a] = true; localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} }
+  function play(n) { try { if (typeof sfx === "function") sfx(n); } catch (e) {} }
+  function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function ease(t) { t = clamp(t); return 1 - Math.pow(1 - t, 3); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function grid(g, rows, x, y, s, pal, lift) {
+    x = Math.round(x); y = Math.round(y);
+    for (var r = 0; r < rows.length; r++) for (var c = 0; c < rows[r].length; c++) {
+      var ch = rows[r].charAt(c); if (ch === ".") continue;
+      var dy = 0;
+      if (lift && ch === "g") { dy = -lift; if (r + dy < 3) continue; }
+      var col = pal && pal[ch] !== undefined ? pal[ch] : PAL[ch];
+      if (!col) continue;
+      g.fillStyle = col; g.fillRect(x + c * s, y + (r + dy) * s, s, s);
+    }
+  }
+  function drawIcon(g, id, x, y, s, opt) { opt = opt || {}; if (ICONS[id]) grid(g, ICONS[id], x, y, s, opt.pal, opt.lift); }
+  function dashed(g, x, y, w, h, col) {
+    g.fillStyle = col;
+    for (var i = 0; i < w; i += 4) { g.fillRect(x + i, y, 2, 1); g.fillRect(x + i, y + h - 1, 2, 1); }
+    for (var j = 0; j < h; j += 4) { g.fillRect(x, y + j, 1, 2); g.fillRect(x + w - 1, y + j, 1, 2); }
+  }
+  function frame(g, x, y, w, h, fill, edge) { g.fillStyle = edge; g.fillRect(x, y, w, h); g.fillStyle = fill; g.fillRect(x + 2, y + 2, w - 4, h - 4); }
+
+  var cur = null, frames = 0;
+  var VW = CW, VH = CH, OX = 0, OY = 0;
+  var FIT = { 1: CH, 2: CH + 48 };
+  function size(act) {
+    var w = W.innerWidth || CW, h = W.innerHeight || CH, fh = FIT[act] || CH;
+    if (w / h >= CW / fh) { VH = fh; VW = Math.round(fh * w / h); } else { VW = CW; VH = Math.round(CW * h / w); }
+    OX = Math.floor((VW - CW) / 2); OY = Math.floor((VH - fh) / 2);
+  }
+  var STARS = []; (function () { var s = 7; for (var i = 0; i < 90; i++) { s = (s * 9301 + 49297) % 233280; var x = s / 233280; s = (s * 9301 + 49297) % 233280; STARS.push([x, s / 233280 * 0.7]); } })();
+  function bg(g, T) {
+    g.fillStyle = "#0b120d"; g.fillRect(0, 0, VW, VH);
+    STARS.forEach(function (p, i) { g.fillStyle = (Math.floor(T * 2 + i) % 7) ? "#2e4034" : "#5a7060"; g.fillRect(Math.round(p[0] * VW), Math.round(p[1] * VH), 1, 1); });
+    g.fillStyle = "#07100a";
+    for (var x = 0; x < VW; x += 10) { var h = 14 + ((x * 37) % 17); for (var k = 0; k < h; k += 3) g.fillRect(x + 5 - (k >> 2), VH - h + k, (k >> 1) + 2, 3); }
+  }
+  function block(g, x, y, w, h, id, st) {
+    x = Math.round(x); y = Math.round(y);
+    if (!st.have) {
+      dashed(g, x, y, w, h, st.red ? "#d04a37" : "rgba(201,162,122,.75)");
+    } else {
+      g.fillStyle = "#1f130a"; g.fillRect(x, y, w, h);
+      g.fillStyle = "#86592f"; g.fillRect(x + 2, y + 2, w - 4, h - 4);
+      g.fillStyle = "#b07a44"; g.fillRect(x + 2, y + 2, w - 4, 2);
+      g.fillStyle = "#3a2514"; g.fillRect(x + 2, y + h - 4, w - 4, 2);
+      g.fillStyle = "rgba(0,0,0,.18)"; for (var i = 12; i < w - 4; i += 12) g.fillRect(x + i, y + 4, 1, h - 8);
+      drawIcon(g, id, x + (w - 24) / 2, y + (h - 24) / 2 - 1, 2, st.fake ? { pal: FAKE } : null);
+    }
+    var sx = x + w - 9, sy = y + 3;
+    frame(g, sx, sy, 7, 7, st.red ? "#d04a37" : st.lit ? "#eaba49" : "#3a2514", "#1f130a");
+    if (st.lit && !st.red) { g.fillStyle = "#ffe08a"; g.fillRect(sx + 2, sy + 2, 2, 2); }
+    if (st.red) { g.fillStyle = "rgba(208,74,55,.38)"; g.fillRect(x, y, w, h); g.fillStyle = "#d04a37"; g.fillRect(x, y, w, 2); g.fillRect(x, y + h - 2, w, 2); g.fillRect(x, y, 2, h); g.fillRect(x + w - 2, y, 2, h); }
+    if (st.check > 0) outline(g, x, y, w, h, st.check);
+  }
+  function outline(g, x, y, w, h, p) {
+    var d = 2 * (w + h) * clamp(p), n;
+    g.fillStyle = "#eaba49";
+    n = Math.min(d, w); g.fillRect(x, y, n, 2); d -= w; if (d <= 0) return;
+    n = Math.min(d, h); g.fillRect(x + w - 2, y, 2, n); d -= h; if (d <= 0) return;
+    n = Math.min(d, w); g.fillRect(x + w - n, y + h - 2, n, 2); d -= w; if (d <= 0) return;
+    n = Math.min(d, h); g.fillRect(x, y + h - n, 2, n);
+  }
+  function link(g, x1, x2, y, red) {
+    var m = Math.round((x1 + x2) / 2);
+    g.fillStyle = "#1f130a"; g.fillRect(m - 8, y - 3, 10, 7); g.fillRect(m - 2, y - 3, 10, 7);
+    g.fillStyle = red ? "#d04a37" : "#9a948c"; g.fillRect(m - 6, y - 1, 6, 3); g.fillRect(m, y - 1, 6, 3);
+    g.fillStyle = "#1f130a"; g.fillRect(m - 4, y, 2, 1); g.fillRect(m + 2, y, 2, 1);
+  }
+  function hunter(g, x, y, step) {
+    grid(g, step ? HUNTER.slice(0, 12).concat(["..kaak.aak.", "..kak..kak", "..kak..kak", "..kk...kk."].map(function (r) { return r.slice(0, 10); })) : HUNTER, x, y, 2);
+  }
+
+  function once(st, k) { if (st.fired[k]) return false; st.fired[k] = true; return !st.mute; }
+
+  var A1 = { y: 66, w: 44, h: 40, step: 58 };
+  function row0(B, n) { return Math.round((CW - ((n - 1) * B.step + B.w)) / 2); }
+  function drawAct1(st, g, T) {
+    var ids = partsOfAct(1).map(function (p) { return p.id; }), B = A1, n = ids.length;
+    var x0 = row0(B, n), bx = function (i) { return x0 + i * B.step; };
+    var coinT0 = 3.9, coinD = 3.6, cx0 = x0 - 2, cx1 = bx(n - 1) + B.w - 6;
+    var cp = clamp((T - coinT0) / coinD), coinX = lerp(cx0, cx1, cp);
+    var huntT0 = 7.8, swapT = 9.0, redT = 9.7;
+    var pos = [];
+    for (var i = 0; i < n; i++) {
+      var tl = 0.5 + i * 0.8, p = (T - tl) / 0.55;
+      if (p <= 0) { pos.push(null); continue; }
+      var e = ease(p), sx = bx(i) + (i % 2 ? 60 : -60), sy = i % 2 ? VH - OY + 10 : -OY - 60;
+      pos.push([lerp(sx, bx(i), e), lerp(sy, B.y, e), p >= 1, clamp((T - tl - 0.55) / 0.45)]);
+      if (p >= 1 && once(st, "land" + i)) play("click");
+      if (p >= 1) tag(st, i, bx(i) + B.w / 2, B.y + B.h + 4);
+    }
+    for (i = 1; i < n; i++) if (pos[i] && pos[i][2] && pos[i - 1] && pos[i - 1][2]) link(g, bx(i - 1) + B.w, bx(i), B.y + B.h / 2, false);
+    for (i = 0; i < n; i++) {
+      if (!pos[i]) continue;
+      var x = pos[i][0], y = pos[i][1], lit = cp > 0 && coinX >= bx(i) + B.w / 2;
+      if (lit && once(st, "lit" + i)) play("coin");
+      block(g, x, y, B.w, B.h, ids[i], { have: earned(ids[i]), lit: lit, check: pos[i][2] ? pos[i][3] : 0 });
+    }
+    if (T >= coinT0) {
+      g.fillStyle = "#c9a27a";
+      for (var f = cx0 + 6, s = 0; f < coinX - 2; f += 7, s++) g.fillRect(Math.round(f), B.y - 2 - (s % 2) * 2, 2, 1);
+      grid(g, COIN, coinX, B.y - 9 - (cp < 1 ? Math.floor(T * 8) % 2 : 0), 1);
+    }
+    if (T >= huntT0) {
+      var hp = clamp((T - huntT0) / (swapT - huntT0)), hx = lerp(-OX - 24, bx(0) - 22, ease(hp)), hy = B.y - 34;
+      hunter(g, hx, hy, hp < 1 && Math.floor(T * 8) % 2);
+      var fx = hx + 20, fy = hy - 6, bad = T >= redT;
+      if (T >= swapT) { var u = ease((T - swapT) / (redT - swapT)); fx = lerp(fx, bx(0) + B.w / 2 - 12, u); fy = lerp(fy, B.y - 28, u); }
+      if (bad) { var v = Math.max(0, T - redT - 0.5); fy += 80 * v * v; if (once(st, "bad")) play("spotted"); }
+      if (fy < VH - OY) {
+        fx = Math.round(fx); fy = Math.round(fy);
+        drawIcon(g, "stamp", fx, fy, 2, { pal: FAKE });
+        if (bad) for (var z = 0; z < 24; z += 2) {
+          g.fillStyle = "#1f130a"; g.fillRect(fx + z - 1, fy + z - 1, 5, 5); g.fillRect(fx + 22 - z - 1, fy + z - 1, 5, 5);
+        }
+        if (bad) for (z = 0; z < 24; z += 2) { g.fillStyle = "#d04a37"; g.fillRect(fx + z, fy + z, 3, 3); g.fillRect(fx + 22 - z, fy + z, 3, 3); }
+      }
+    }
+  }
+
+  var A2 = { y: 130, w: 44, h: 34, step: 58, river0: 30, river1: 106, gap: 64, iy: 78 };
+  function water(g, T, w) {
+    var y0 = A2.river0, y1 = A2.river1;
+    g.fillStyle = "#1f130a"; g.fillRect(0, y0 - 3, w, 3); g.fillRect(0, y1, w, 3);
+    g.fillStyle = "#3a2514"; g.fillRect(0, y0 - 5, w, 2); g.fillRect(0, y1 + 3, w, 2);
+    g.fillStyle = "#17394d"; g.fillRect(0, y0, w, y1 - y0);
+    g.fillStyle = "#1d4a63";
+    for (var r = y0 + 4; r < y1; r += 8) g.fillRect(0, r, w, 3);
+    for (r = y0 + 3; r < y1 - 2; r += 6) {
+      var dir = (r / 6) % 2 ? 1 : -0.6, off = (T * 18 * dir) % 40;
+      g.fillStyle = r % 12 ? "#2b6a88" : "#9ff0fc";
+      for (var x = -40 + off; x < w; x += 40) { var xx = Math.round(x + (r * 7) % 40); if (xx >= 0 && xx < w - 6) g.fillRect(xx, r, r % 12 ? 6 : 3, 1); }
+    }
+  }
+  function drawAct2(st, g, T) {
+    var ids1 = partsOfAct(1).map(function (p) { return p.id; }), ids2 = partsOfAct(2).map(function (p) { return p.id; }), B = A2;
+    var x0 = row0(B, ids1.length), bx = function (i) { return x0 + i * B.step; };
+    var n2 = ids2.length, xs = ids2.map(function (_, i) { return Math.round(CW / 2 + (i - (n2 - 1) / 2) * B.gap); });
+    var ARR0 = 5.8, ARRD = 1.15, arr = function (id) { var i = ids2.indexOf(id); return i < 0 ? 99 : ARR0 + i * ARRD; };
+    var tOut = ARR0 + (n2 - 1) * ARRD + 0.7, tBox = arr("box"), tGate = arr("gate"), tJar = arr("jar"), tKey = arr("key");
+    for (var i = 0; i < ids1.length; i++) {
+      if (i) link(g, bx(i - 1) + B.w, bx(i), B.y + B.h / 2, false);
+    }
+    for (i = 0; i < ids1.length; i++) block(g, bx(i), B.y, B.w, B.h, ids1[i], { have: earned(ids1[i]), lit: true });
+    var rw = Math.round(VW * ease((T - 0.3) / 1.0));
+    if (rw > 0) { g.save(); g.translate(-OX, 0); water(g, T, rw); g.restore(); }
+    var K = [[4.4, bx(0) + 14, B.y - 16], [4.7, 40, B.y - 44], [5.0, 20, 52]];
+    xs.forEach(function (x, j) { K.push([ARR0 + j * ARRD, x - 8, 52]); });
+    K.push([tOut, 296, 52], [tOut + 0.3, 300, 4], [tOut + 0.5, 300, 6]);
+    var cx = K[0][1], cy = K[0][2];
+    if (T >= K[K.length - 1][0]) { cx = K[K.length - 1][1]; cy = K[K.length - 1][2]; }
+    else for (var k = 1; k < K.length; k++) if (T < K[k][0]) { var q = (T - K[k - 1][0]) / (K[k][0] - K[k - 1][0]); q = clamp(q); cx = lerp(K[k - 1][1], K[k][1], q); cy = lerp(K[k - 1][2], K[k][2], q); break; }
+    var inRiver = T >= 5.0 && T < tOut, boxed = T >= tBox && T < tOut;
+    for (i = 0; i < n2; i++) {
+      var tl = 1.4 + i * 0.5, p = (T - tl) / 0.45;
+      if (p <= 0) continue;
+      var x = xs[i] - 12, y = lerp(-30, B.iy, ease(p)), id = ids2[i], have = earned(id);
+      if (p >= 1 && once(st, "land" + i)) play("click");
+      g.fillStyle = "#1f130a"; g.fillRect(x - 4, y + 22, 32, 5); g.fillStyle = "#86592f"; g.fillRect(x - 3, y + 23, 30, 3);
+      var glow = (id === "box" && T >= tBox && T < tBox + 0.4) || (id === "gate" && T >= tGate - 0.5 && T < tGate) || (id === "key" && T >= tKey - 0.2 && T < tOut + 0.6);
+      if (glow) { g.fillStyle = Math.floor(T * 10) % 2 ? "#ffe08a" : "#eaba49"; g.fillRect(x - 3, y - 3, 30, 30); g.fillStyle = "#17394d"; g.fillRect(x - 1, y - 1, 26, 26); }
+      if (!have) dashed(g, x, y, 24, 24, "rgba(201,162,122,.8)");
+      else if (id === "gate") drawIcon(g, "gate", x, y, 2, { lift: Math.round(6 * clamp((T - (tGate - 0.5)) / 0.4)) });
+      else if (id === "jar") drawIcon(g, "jar", x, y, 2, T >= tJar + 0.5 ? null : { pal: { G: "#24414f", H: "#24414f", K: "#24414f" } });
+      else drawIcon(g, id, x, y, 2);
+      if (!have && id === "jar" && T >= tJar + 0.5) grid(g, TAG, x + 7, y + 7, 2);
+      var used = arr(id) - (id === "gate" ? 0.5 : id === "key" ? 0.2 : 0);
+      if (p >= 1 && T >= used) { outline(g, x - 4, y - 4, 32, 32, (T - used) / 0.45); tag(st, i, xs[i], B.iy + 30, B.gap - 4); }
+      else if (st.tags && st.tags[i]) st.tags[i].classList.remove("on");
+    }
+    if (T >= 5.0 && T < 5.5) {
+      var sp = (T - 5.0) / 0.5; if (once(st, "splash")) play("splash");
+      g.fillStyle = "#9ff0fc";
+      for (var d = 0; d < 6; d++) g.fillRect(Math.round(28 + Math.cos(d) * 14 * sp), Math.round(52 - Math.sin(d * 0.5 + 0.3) * 18 * sp + 10 * sp * sp), 2, 2);
+    }
+    if (T >= tJar && T < tJar + 0.5) { var tp = (T - tJar) / 0.5; grid(g, TAG, xs[ids2.indexOf("jar")] - 5, lerp(cy + 14, B.iy + 7, tp * tp), 2); if (once(st, "tok")) play("coin"); }
+    if (T >= tGate - 0.5 && once(st, "gate")) play("click");
+    if (T >= 4.1) {
+      var bob = inRiver ? Math.round(Math.sin(T * 6) * 1.5) : 0;
+      if (T >= tBox - 0.2 && T < tBox + 0.1 || T >= tOut - 0.1 && T < tOut + 0.2) { g.fillStyle = "#ffe08a"; g.fillRect(Math.round(cx) - 3, Math.round(cy) + 6, 22, 4); g.fillRect(Math.round(cx) + 6, Math.round(cy) - 3, 4, 22); }
+      grid(g, boxed ? MINI : COIN, cx, cy + bob, 2);
+      if (T >= tOut && once(st, "out")) play("coin");
+    }
+  }
+
+  function makeEl(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
+  var TAGS = { pouch: "YOUR WALLET", stamp: "YOUR STAMP", tracks: "YOUR FOOTPRINTS", box: "SEALED NOTE", gate: "PROOF GATE", jar: "TAG JAR", key: "GLASS KEY" };
+  function tag(st, i, x, y, w) {
+    var el = st.tags && st.tags[i]; if (!el) return;
+    el.style.left = ((OX + x) / VW * 100) + "%"; el.style.top = ((OY + y) / VH * 100) + "%"; el.style.width = ((w || A1.step - 4) / VW * 100) + "%";
+    el.classList.add("on");
+  }
+  function assemble(act, then) {
+    act = act === 2 ? 2 : 1;
+    if (cur) return false;
+    var reduce = false; try { reduce = W.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+    var root = makeEl("div", "tm-scene"), stage = makeEl("div", "tm-stage"), foot = makeEl("div", "tm-foot");
+    var cv = makeEl("canvas", "tm-cv"), line = makeEl("p", "tm-line"), btn = makeEl("button", "tm-btn"), prevBtn = makeEl("button", "tm-prev"), row = makeEl("div", "tm-btns");
+    root.setAttribute("role", "dialog"); root.setAttribute("aria-label", LINES[act]);
+    cv.setAttribute("aria-hidden", "true");
+    line.setAttribute("aria-live", "polite"); btn.type = "button"; prevBtn.type = "button"; prevBtn.textContent = "PREV";
+    stage.appendChild(cv);
+    var tags = partsOfAct(act).map(function (p) { var t = makeEl("span", "tm-tag"); t.textContent = TAGS[p.id] || p.name; stage.appendChild(t); return t; });
+    row.appendChild(btn); row.appendChild(prevBtn);
+    foot.appendChild(line); foot.appendChild(row);
+    root.appendChild(stage); root.appendChild(foot);
+    document.body.appendChild(root);
+    var g = cv.getContext("2d");
+    var layout = function () {
+      size(act); cv.width = VW; cv.height = VH; g.imageSmoothingEnabled = false;
+      foot.style.top = ((OY + (act === 1 ? A1.y + A1.h + 20 : A2.y + A2.h + 8)) / VH * 100) + "%";
+    };
+    layout();
+    W.addEventListener("resize", layout);
+    var beats = BEATS[act];
+    var st = { act: act, then: then, speed: reduce ? 2 : 1, last: null, T: 0, end: ENDS[act], ended: false, raf: 0, fired: {}, mute: false, armed: Date.now() + 300, beat: 0, hold: false, tags: tags };
+    cur = st;
+    var draw = act === 1 ? drawAct1 : drawAct2;
+    var shown = makeEl("span", ""), rest = makeEl("span", "tm-rest");
+    line.appendChild(shown); line.appendChild(rest);
+    var typ = { text: "", n: 0, acc: 0, at: null, cuts: null };
+    var paint = function () { shown.textContent = typ.text.slice(0, typ.n); rest.textContent = typ.text.slice(typ.n); st.typed = typ.n; };
+    var say = function (text, b) {
+      typ.text = text; typ.n = 0; typ.acc = 0; typ.at = b && b.parts ? b.at : null; typ.cuts = null;
+      if (typ.at) { var c = 0; typ.cuts = b.parts.map(function (p) { var s = c; c += p.length; return s; }); }
+      line.classList.add("on"); paint();
+      if (st.mute) talked();
+    };
+    var talked = function () { typ.n = typ.text.length; paint(); };
+    var allowed = function () {
+      if (!typ.at) return typ.text.length;
+      var k = -1; while (k + 1 < typ.at.length && st.T >= typ.at[k + 1]) k++;
+      return k < 0 ? 0 : k + 1 < typ.cuts.length ? typ.cuts[k + 1] : typ.text.length;
+    };
+    var talk = function (dt) {
+      var lim = allowed(), was = typ.n;
+      typ.acc += dt;
+      while (typ.n < lim) {
+        var prevCh = typ.text.charAt(typ.n - 1), gap = /[.!?]/.test(prevCh) ? 0.22 : prevCh === "," ? 0.1 : 0.035;
+        if (typ.acc < gap) break;
+        typ.acc -= gap;
+        var ch = typ.text.charAt(typ.n++);
+        if (!st.mute && /[A-Z0-9]/.test(ch) && typ.n % 2 && typeof sfx === "function") try { sfx("voice", { f: 300 * (1 + (Math.random() - 0.5) * 0.08), wave: "square", vol: 0.05 }); } catch (e) {}
+      }
+      if (typ.n >= lim) typ.acc = 0;
+      if (typ.n !== was) paint();
+    };
+    var limit = function () { return st.beat < beats.length ? beats[st.beat].t1 : st.end; };
+    var showEnd = function () {
+      if (st.ended) return; st.ended = true;
+      say(LINES[act]); btn.textContent = "CONTINUE";
+      try { btn.focus({ preventScroll: true }); } catch (e) {}
+    };
+    var holdBeat = function () {
+      st.hold = true; btn.textContent = "NEXT";
+      try { btn.focus({ preventScroll: true }); } catch (e) {}
+    };
+    var next = function () {
+      if (st.ended || Date.now() < st.armed) return;
+      st.armed = Date.now() + 250;
+      if (!st.hold || typ.n < typ.text.length) { st.T = limit(); talked(); return; }
+      st.hold = false; st.beat++;
+      if (st.beat < beats.length) say(beats[st.beat].say, beats[st.beat]);
+    };
+    var prev = function () {
+      var to = st.ended ? beats.length - 1 : st.beat - 1;
+      if (to < 0 || Date.now() < st.armed) return;
+      st.armed = Date.now() + 250; st.ended = false; st.mute = false;
+      st.beat = to; st.T = beats[to].t1; st.hold = true;
+      say(beats[to].say, beats[to]); talked(); btn.textContent = "NEXT";
+      try { btn.focus({ preventScroll: true }); } catch (e) {}
+    };
+    var skip = function () {
+      if (st.ended || Date.now() < st.armed) return;
+      st.mute = true; st.hold = false; st.beat = beats.length; st.T = st.end;
+    };
+    say(beats[0].say, beats[0]);
+    btn.textContent = "NEXT"; btn.classList.add("on"); prevBtn.classList.add("on"); prevBtn.disabled = true;
+    var close = function () {
+      if (cur !== st) return;
+      cur = null; if (st.raf) cancelAnimationFrame(st.raf); st.raf = 0;
+      W.removeEventListener("keydown", onKey, true); W.removeEventListener("resize", layout);
+      if (root.parentNode) root.parentNode.removeChild(root);
+      play("click");
+      if (typeof st.then === "function") st.then();
+    };
+    var onKey = function (e) {
+      if (cur !== st) return;
+      var k = e.key;
+      if (k === "Tab") return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      if (e.repeat) return;
+      if (k === "ArrowLeft" || k === "Backspace") prev();
+      else if (st.ended) { if ((k === "Enter" || k === " ") && Date.now() > st.armed) close(); }
+      else if (k === "Escape") skip();
+      else if (k === " " || k === "Enter") next();
+    };
+    W.addEventListener("keydown", onKey, true);
+    btn.addEventListener("click", function (e) { e.stopPropagation(); if (st.ended) close(); else { st.armed = 0; next(); } });
+    prevBtn.addEventListener("click", function (e) { e.stopPropagation(); st.armed = 0; prev(); });
+    var tick = function (now) {
+      st.raf = 0;
+      if (cur !== st) return;
+      var dt = st.last === null ? 0 : Math.min(0.1, (now - st.last) / 1000) * st.speed;
+      st.last = now;
+      if (!st.hold) st.T = Math.min(st.ended ? st.end + 60 : limit(), st.T + dt);
+      frames++;
+      resolve(); held = true;
+      bg(g, st.T); g.save(); g.translate(OX, OY);
+      try { draw(st, g, st.T); } finally { held = false; g.restore(); }
+      talk(dt);
+      if (!st.hold && st.T >= limit() && typ.n >= typ.text.length) {
+        if (st.beat < beats.length) holdBeat();
+        else if (!st.ended) { st.armed = Date.now() + 250; showEnd(); }
+      }
+      prevBtn.disabled = !(st.ended || st.beat > 0);
+      st.raf = requestAnimationFrame(tick);
+    };
+    st.raf = requestAnimationFrame(tick);
+    return true;
+  }
+
+  var justWon = null;
+  if (typeof W.showComplete === "function") {
+    var baseComplete = W.showComplete;
+    W.showComplete = function () { try { justWon = game.levelIdx; } catch (e) {} return baseComplete.apply(this, arguments); };
+  }
+  if (BH.story) {
+    var baseGate = BH.story.gate, SCENE = false;
+    BH.story.gate = function (i, then) {
+      var c = gateAt(1), r = gateAt(2), a = i === c ? 1 : i === r ? 2 : 0;
+      var done = false; try { done = !!(save && save.stars && save.stars[i] != null); } catch (e) {}
+      if (a && done && !cur && justWon === i - 1) {
+        justWon = null;
+        markPlayed(a);
+        var self = this, args = arguments, go = function () { if (!(baseGate && baseGate.apply(self, args))) then(i); };
+        if (a === 1 && SCENE && BH.trailScene && BH.trailScene.canPlay(i)) BH.trailScene.play(go);
+        else assemble(a, go);
+        return true;
+      }
+      return baseGate ? baseGate.apply(this, arguments) : false;
+    };
+  }
+
+  var door = /[?&]machine=([12])(&|$)/.exec(location.search || "");
+  if (door && BH.testDoors === true) {
+    var tries = 0;
+    var wait = function () {
+      if (typeof game !== "undefined" && game && game.screen) {
+        assemble(+door[1], function () { if (typeof showSelect === "function") showSelect(); });
+      } else if (++tries < 100) setTimeout(wait, 100);
+    };
+    setTimeout(wait, 200);
+  }
+
+  BH.trailMachine = {
+    parts: PARTS, resolve: resolve, gateAt: gateAt, earned: earned, assemble: assemble, drawIcon: drawIcon, played: played,
+    isOpen: function () { return !!cur; },
+    beats: BEATS, lines: LINES, fake: FAKE,
+    stats: function () { return { frames: frames, open: !!cur, raf: cur ? cur.raf : 0, T: cur ? cur.T : null, beat: cur ? cur.beat : null, hold: cur ? cur.hold : null, ended: cur ? cur.ended : null, typed: cur ? cur.typed : null }; }
+  };
+})();

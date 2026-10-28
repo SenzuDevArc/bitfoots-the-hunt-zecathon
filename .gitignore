@@ -1,0 +1,7 @@
+node_modules/
+*.log
+.env
+.env.*
+shots/
+.trail-drive.lock/
+.claude/
